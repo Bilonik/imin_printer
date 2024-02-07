@@ -828,6 +828,8 @@ public class IminPrinterPlugin implements FlutterPlugin, MethodCallHandler, Stre
             case "getServiceVersion":
                 if (iminPrintUtils == null) {
                     result.success(PrinterHelper.getInstance().getServiceVersion());
+                }else{
+                    result.success("0.0");
                 }
                 break;
             case "getPrinterHardwareVersion":
