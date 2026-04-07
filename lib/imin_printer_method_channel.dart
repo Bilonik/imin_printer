@@ -1,12 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'enums.dart';
-import 'column_maker.dart';
-import 'imin_style.dart';
-import 'imin_printer_platform_interface.dart';
 import 'package:logger/logger.dart';
+
+import 'column_maker.dart';
+import 'enums.dart';
+import 'imin_printer_platform_interface.dart';
+import 'imin_style.dart';
 
 var logger = Logger();
 
@@ -46,7 +48,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
     logger.d('code $code');
     Map<String, dynamic> printerStatus = <String, dynamic>{
       "code": code,
-      "msg": PrinterStatus.getValue(code ?? '-1')
+      "msg": PrinterStatus.getValue(code ?? '-1'),
     };
     return printerStatus;
   }
@@ -58,9 +60,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> printAndFeedPaper(int height) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "height": height,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"height": height};
     await methodChannel.invokeMethod<void>('printAndFeedPaper', arguments);
   }
 
@@ -79,42 +79,32 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setTextSize(int size) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "size": size,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"size": size};
     await methodChannel.invokeMethod<void>('setTextSize', arguments);
   }
 
   @override
   Future<void> setTextTypeface(IminTypeface typeface) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "font": typeface.index,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"font": typeface.index};
     await methodChannel.invokeMethod<void>('setTextTypeface', arguments);
   }
 
   @override
   Future<void> setTextStyle(IminFontStyle style) async {
-    logger.d('setTextStyle', style.index);
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "style": style.index,
-    };
+    logger.d('setTextStyle ${style.index}');
+    Map<String, dynamic> arguments = <String, dynamic>{"style": style.index};
     await methodChannel.invokeMethod<void>('setTextStyle', arguments);
   }
 
   @override
   Future<void> setTextLineSpacing(double space) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "space": space,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"space": space};
     await methodChannel.invokeMethod<void>('setTextLineSpacing', arguments);
   }
 
   @override
   Future<void> setTextWidth(int width) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "width": width,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"width": width};
     await methodChannel.invokeMethod<void>('setTextWidth', arguments);
   }
 
@@ -146,7 +136,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
             'align': style.align!.index,
           };
           await methodChannel.invokeMethod<void>(
-              'printTextBitmapWithAli', bitmapArgs);
+            'printTextBitmapWithAli',
+            bitmapArgs,
+          );
         } else {
           await methodChannel.invokeMethod<void>('printTextBitmap', arguments);
         }
@@ -233,26 +225,23 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> printColumnsText({required List<ColumnMaker> cols}) async {
     final jsonCols = List<Map<String, String>>.from(
-        cols.map<Map<String, String>>((ColumnMaker col) => col.toJson()));
+      cols.map<Map<String, String>>((ColumnMaker col) => col.toJson()),
+    );
     Map<String, dynamic> arguments = <String, dynamic>{
-      "cols": json.encode(jsonCols)
+      "cols": json.encode(jsonCols),
     };
     await methodChannel.invokeMethod<void>('printColumnsText', arguments);
   }
 
   @override
   Future<void> setBarCodeWidth(int width) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "width": width,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"width": width};
     await methodChannel.invokeMethod<void>('setBarCodeWidth', arguments);
   }
 
   @override
   Future<void> setBarCodeHeight(int height) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "height": height,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"height": height};
     await methodChannel.invokeMethod<void>('setBarCodeHeight', arguments);
   }
 
@@ -262,15 +251,20 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
       "position": position.position,
     };
     await methodChannel.invokeMethod<void>(
-        'setBarCodeContentPrintPos', arguments);
+      'setBarCodeContentPrintPos',
+      arguments,
+    );
   }
 
   @override
-  Future<void> printBarCode(IminBarcodeType barCodeType, String barCodeContent,
-      {IminBarCodeStyle? style}) async {
+  Future<void> printBarCode(
+    IminBarcodeType barCodeType,
+    String barCodeContent, {
+    IminBarCodeStyle? style,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "data": barCodeContent,
-      "type": barCodeType.type
+      "type": barCodeType.type,
     };
     if (style != null) {
       if (style.align != null &&
@@ -301,41 +295,44 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> printBarCodeToBitmapFormat(String barCodeContent, int width,
-      int height, IminBarCodeToBitmapFormat codeFormat) async {
+  Future<void> printBarCodeToBitmapFormat(
+    String barCodeContent,
+    int width,
+    int height,
+    IminBarCodeToBitmapFormat codeFormat,
+  ) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "data": barCodeContent,
       "width": width,
       "height": height,
-      "codeFormat": codeFormat.index
+      "codeFormat": codeFormat.index,
     };
     await methodChannel.invokeMethod<void>(
-        'printBarCodeToBitmapFormat', arguments);
+      'printBarCodeToBitmapFormat',
+      arguments,
+    );
   }
 
   @override
   Future<void> setQrCodeSize(int qrSize) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "qrSize": qrSize,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"qrSize": qrSize};
     await methodChannel.invokeMethod<void>('setQrCodeSize', arguments);
   }
 
   @override
   Future<void> setQrCodeErrorCorrectionLev(
-      IminQrcodeCorrectionLevel level) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "level": level.level,
-    };
+    IminQrcodeCorrectionLevel level,
+  ) async {
+    Map<String, dynamic> arguments = <String, dynamic>{"level": level.level};
     await methodChannel.invokeMethod<void>(
-        'setQrCodeErrorCorrectionLev', arguments);
+      'setQrCodeErrorCorrectionLev',
+      arguments,
+    );
   }
 
   @override
   Future<void> setLeftMargin(int margin) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "margin": margin,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"margin": margin};
     await methodChannel.invokeMethod<void>('setLeftMargin', arguments);
   }
 
@@ -349,7 +346,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
         arguments.putIfAbsent("alignment", () => qrCodeStyle.align?.index);
         arguments.putIfAbsent("qrSize", () => qrCodeStyle.qrSize!);
         arguments.putIfAbsent(
-            "level", () => qrCodeStyle.errorCorrectionLevel?.level);
+          "level",
+          () => qrCodeStyle.errorCorrectionLevel?.level,
+        );
         if (qrCodeStyle.leftMargin != null) {
           await setLeftMargin(qrCodeStyle.leftMargin!);
         }
@@ -375,15 +374,15 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setPageFormat({int? style = 1}) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "style": style,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"style": style};
     await methodChannel.invokeMethod<void>('setPageFormat', arguments);
   }
 
   @override
-  Future<void> printSingleBitmap(dynamic img,
-      {IminPictureStyle? pictureStyle}) async {
+  Future<void> printSingleBitmap(
+    dynamic img, {
+    IminPictureStyle? pictureStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{};
     if (pictureStyle != null) {
       if (pictureStyle.alignment != null) {
@@ -403,8 +402,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> printSingleBitmapWithTranslation(dynamic img,
-      {IminPictureStyle? pictureStyle}) async {
+  Future<void> printSingleBitmapWithTranslation(
+    dynamic img, {
+    IminPictureStyle? pictureStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{};
     if (pictureStyle != null) {
       if (pictureStyle.alignment != null) {
@@ -418,15 +419,19 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
     arguments.putIfAbsent("bitmap", () => img);
     if (img is Uint8List) {
       await methodChannel.invokeMethod<void>(
-          'printSingleBitmapWithTranslation', arguments);
+        'printSingleBitmapWithTranslation',
+        arguments,
+      );
     } else {
       await methodChannel.invokeMethod<void>('printBitmapToUrl', arguments);
     }
   }
 
   @override
-  Future<void> printMultiBitmap(List<dynamic> imgs,
-      {IminPictureStyle? pictureStyle}) async {
+  Future<void> printMultiBitmap(
+    List<dynamic> imgs, {
+    IminPictureStyle? pictureStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{};
     if (pictureStyle != null) {
       if (pictureStyle.alignment != null) {
@@ -438,17 +443,14 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
       }
     }
     arguments.putIfAbsent("bitmaps", () => imgs);
-    if (imgs is List<Uint8List>) {
-      await methodChannel.invokeMethod<void>('printMultiBitmap', arguments);
-    } else {
-      arguments.putIfAbsent("multiBitmap", () => 1);
-      await methodChannel.invokeMethod<void>('printBitmapToUrl', arguments);
-    }
+    await methodChannel.invokeMethod<void>('printMultiBitmap', arguments);
   }
 
   @override
-  Future<void> printSingleBitmapBlackWhite(dynamic img,
-      {IminBaseStyle? baseStyle}) async {
+  Future<void> printSingleBitmapBlackWhite(
+    dynamic img, {
+    IminBaseStyle? baseStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{};
     if (baseStyle != null) {
       if (baseStyle.width != null && baseStyle.height != null) {
@@ -459,7 +461,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
     arguments.putIfAbsent("bitmap", () => img);
     if (img is Uint8List) {
       await methodChannel.invokeMethod<void>(
-          'printSingleBitmapBlackWhite', arguments);
+        'printSingleBitmapBlackWhite',
+        arguments,
+      );
     } else {
       arguments.putIfAbsent("blackWhite", () => 1);
       await methodChannel.invokeMethod<void>('printBitmapToUrl', arguments);
@@ -487,7 +491,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> setDoubleQR1MarginLeft(int leftMargin) async {
     Map<String, dynamic> arguments = <String, dynamic>{
-      "leftMargin": leftMargin
+      "leftMargin": leftMargin,
     };
     await methodChannel.invokeMethod<void>('setDoubleQR1MarginLeft', arguments);
   }
@@ -495,7 +499,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> setDoubleQR2MarginLeft(int leftMargin) async {
     Map<String, dynamic> arguments = <String, dynamic>{
-      "leftMargin": leftMargin
+      "leftMargin": leftMargin,
     };
     await methodChannel.invokeMethod<void>('setDoubleQR2MarginLeft', arguments);
   }
@@ -513,13 +517,14 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> printDoubleQR(
-      {required IminDoubleQRCodeStyle qrCode1,
-      required IminDoubleQRCodeStyle qrCode2,
-      int? doubleQRSize}) async {
+  Future<void> printDoubleQR({
+    required IminDoubleQRCodeStyle qrCode1,
+    required IminDoubleQRCodeStyle qrCode2,
+    int? doubleQRSize,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "qrCode1Text": qrCode1.text,
-      "qrCode2Text": qrCode2.text
+      "qrCode2Text": qrCode2.text,
     };
     if (qrCode1.leftMargin != null) {
       await setDoubleQR1MarginLeft(qrCode1.leftMargin!);
@@ -549,7 +554,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> setInitIminPrinter(bool isDefaultPrinter) async {
     Map<String, dynamic> arguments = <String, dynamic>{
-      "isDefault": isDefaultPrinter
+      "isDefault": isDefaultPrinter,
     };
     await methodChannel.invokeMethod<void>('setInitIminPrinter', arguments);
   }
@@ -591,8 +596,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<String?> getPrinterFirmwareVersion() async {
-    return await methodChannel
-        .invokeMethod<String>('getPrinterFirmwareVersion');
+    return await methodChannel.invokeMethod<String>(
+      'getPrinterFirmwareVersion',
+    );
   }
 
   @override
@@ -602,8 +608,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<String?> getPrinterHardwareVersion() async {
-    return await methodChannel
-        .invokeMethod<String>('getPrinterHardwareVersion');
+    return await methodChannel.invokeMethod<String>(
+      'getPrinterHardwareVersion',
+    );
   }
 
   @override
@@ -677,25 +684,19 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setTextBitmapTypeface(IminTypeface typeface) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "font": typeface.index,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"font": typeface.index};
     await methodChannel.invokeMethod<void>('setTextBitmapTypeface', arguments);
   }
 
   @override
   Future<void> setTextBitmapSize(int size) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "size": size,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"size": size};
     await methodChannel.invokeMethod<void>('setTextBitmapSize', arguments);
   }
 
   @override
   Future<void> setTextBitmapStyle(IminFontStyle style) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "style": style.index,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"style": style.index};
     await methodChannel.invokeMethod<void>('setTextBitmapStyle', arguments);
   }
 
@@ -705,7 +706,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
       "strikeThru": strikeThru,
     };
     await methodChannel.invokeMethod<void>(
-        'setTextBitmapStrikeThru', arguments);
+      'setTextBitmapStrikeThru',
+      arguments,
+    );
   }
 
   @override
@@ -722,29 +725,31 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
       "lineHeight": lineHeight,
     };
     await methodChannel.invokeMethod<void>(
-        'setTextBitmapLineSpacing', arguments);
+      'setTextBitmapLineSpacing',
+      arguments,
+    );
   }
 
   @override
   Future<void> setTextBitmapLetterSpacing(double space) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "letterSpacing": space,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"letterSpacing": space};
     await methodChannel.invokeMethod<void>(
-        'setTextBitmapLetterSpacing', arguments);
+      'setTextBitmapLetterSpacing',
+      arguments,
+    );
   }
 
   @override
   Future<void> setTextBitmapAntiWhite(bool antiWhite) async {
-    Map<String, dynamic> arguments = <String, dynamic>{
-      "antiWhite": antiWhite,
-    };
+    Map<String, dynamic> arguments = <String, dynamic>{"antiWhite": antiWhite};
     await methodChannel.invokeMethod<void>('setTextBitmapAntiWhite', arguments);
   }
 
   @override
-  Future<void> printTextBitmap(String text,
-      {IminTextPictureStyle? style}) async {
+  Future<void> printTextBitmap(
+    String text, {
+    IminTextPictureStyle? style,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{};
     if (style != null) {
       // if (style.wordWrap != null && style.wordWrap == false) {
@@ -775,7 +780,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
       }
 
       if (style.lineHeight != null) {
-        logger.d('lineHeight', style.lineHeight);
+        logger.d('lineHeight ${style.lineHeight}');
         await setTextBitmapLineSpacing(style.lineHeight!);
       }
 
@@ -795,15 +800,19 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
     if (style != null && style.align != null) {
       arguments.putIfAbsent('align', () => style.align!.index);
       await methodChannel.invokeMethod<void>(
-          'printTextBitmapWithAli', arguments);
+        'printTextBitmapWithAli',
+        arguments,
+      );
     } else {
       await methodChannel.invokeMethod<void>('printTextBitmap', arguments);
     }
   }
 
   @override
-  Future<void> printSingleBitmapColorChart(dynamic img,
-      {IminPictureStyle? pictureStyle}) async {
+  Future<void> printSingleBitmapColorChart(
+    dynamic img, {
+    IminPictureStyle? pictureStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{};
     if (pictureStyle != null) {
       if (pictureStyle.alignment != null) {
@@ -817,7 +826,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
     arguments.putIfAbsent("bitmap", () => img);
     if (img is Uint8List) {
       await methodChannel.invokeMethod<void>(
-          'printBitmapColorChart', arguments);
+        'printBitmapColorChart',
+        arguments,
+      );
     } else {
       arguments.putIfAbsent("SingleBitmapColorChart", () => 1);
       await methodChannel.invokeMethod<void>('printBitmapToUrl', arguments);
@@ -827,9 +838,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> printColumnsString({required List<ColumnMaker> cols}) async {
     final jsonCols = List<Map<String, String>>.from(
-        cols.map<Map<String, String>>((ColumnMaker col) => col.toJson()));
+      cols.map<Map<String, String>>((ColumnMaker col) => col.toJson()),
+    );
     Map<String, dynamic> arguments = <String, dynamic>{
-      "cols": json.encode(jsonCols)
+      "cols": json.encode(jsonCols),
     };
     await methodChannel.invokeMethod<void>('printColumnsString', arguments);
   }
@@ -874,14 +886,16 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<List<String>?> getPrinterDensityList() async {
-    return await methodChannel
-        .invokeMethod<List<String>>('getPrinterDensityList');
+    return await methodChannel.invokeMethod<List<String>>(
+      'getPrinterDensityList',
+    );
   }
 
   @override
   Future<List<String>?> getPrinterSpeedList() async {
-    return await methodChannel
-        .invokeMethod<List<String>>('getPrinterSpeedList');
+    return await methodChannel.invokeMethod<List<String>>(
+      'getPrinterSpeedList',
+    );
   }
 
   @override
@@ -903,8 +917,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<List<String>?> getPrinterPaperTypeList() async {
-    return await methodChannel
-        .invokeMethod<List<String>>('getPrinterPaperTypeList');
+    return await methodChannel.invokeMethod<List<String>>(
+      'getPrinterPaperTypeList',
+    );
   }
 
   @override
@@ -928,8 +943,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> labelAddText(String text,
-      {LabelTextStyle? labelTextStyle}) async {
+  Future<void> labelAddText(
+    String text, {
+    LabelTextStyle? labelTextStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "text": text,
       "labelTexStyle": labelTextStyle?.toMap(),
@@ -938,8 +955,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> labelAddBarCode(String barCode,
-      {LabelBarCodeStyle? barCodeStyle}) async {
+  Future<void> labelAddBarCode(
+    String barCode, {
+    LabelBarCodeStyle? barCodeStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "barCode": barCode,
       "barCodeStyle": barCodeStyle?.toMap(),
@@ -948,8 +967,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> labelAddQrCode(String qrCode,
-      {LabelQrCodeStyle? qrCodeStyle}) async {
+  Future<void> labelAddQrCode(
+    String qrCode, {
+    LabelQrCodeStyle? qrCodeStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "qrCode": qrCode,
       "qrCodeStyle": qrCodeStyle?.toMap(),
@@ -966,8 +987,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   }
 
   @override
-  Future<void> labelAddBitmap(dynamic img,
-      {LabelBitmapStyle? addBitmapStyle}) async {
+  Future<void> labelAddBitmap(
+    dynamic img, {
+    LabelBitmapStyle? addBitmapStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "addBitmapStyle": addBitmapStyle?.toMap(),
     };
@@ -983,14 +1006,16 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> labelPrintCanvas(int printCount) async {
     Map<String, dynamic> arguments = <String, dynamic>{
-      "printCount": printCount
+      "printCount": printCount,
     };
     await methodChannel.invokeMethod<void>('labelPrintCanvas', arguments);
   }
 
   @override
-  Future<void> printLabelBitmap(dynamic img,
-      {LabelPrintBitmapStyle? printBitmapStyle}) async {
+  Future<void> printLabelBitmap(
+    dynamic img, {
+    LabelPrintBitmapStyle? printBitmapStyle,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{
       "printBitmapStyle": printBitmapStyle?.toMap(),
     };
@@ -1010,7 +1035,7 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   @override
   Future<void> setPrintModel(int printModel) async {
     Map<String, dynamic> arguments = <String, dynamic>{
-      "printModel": printModel
+      "printModel": printModel,
     };
     await methodChannel.invokeMethod<void>('setPrintModel', arguments);
   }
@@ -1027,8 +1052,10 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   // --- ESC/POS 字体控制 ---
   @override
   Future<void> setFontMultiple(int wide, int high) async {
-    await methodChannel
-        .invokeMethod<void>('setFontMultiple', {"wide": wide, "high": high});
+    await methodChannel.invokeMethod<void>('setFontMultiple', {
+      "wide": wide,
+      "high": high,
+    });
   }
 
   @override
@@ -1038,8 +1065,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setFontAntiWhite(bool antiWhite) async {
-    await methodChannel
-        .invokeMethod<void>('setFontAntiWhite', {"antiWhite": antiWhite});
+    await methodChannel.invokeMethod<void>('setFontAntiWhite', {
+      "antiWhite": antiWhite,
+    });
   }
 
   @override
@@ -1049,8 +1077,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setFontUnderline(int underline) async {
-    await methodChannel
-        .invokeMethod<void>('setFontUnderline', {"underline": underline});
+    await methodChannel.invokeMethod<void>('setFontUnderline', {
+      "underline": underline,
+    });
   }
 
   @override
@@ -1060,60 +1089,75 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setFontDirection(int direction) async {
-    await methodChannel
-        .invokeMethod<void>('setFontDirection', {"direction": direction});
+    await methodChannel.invokeMethod<void>('setFontDirection', {
+      "direction": direction,
+    });
   }
 
   @override
   Future<void> setFontLineSpacing(int space) async {
-    await methodChannel
-        .invokeMethod<void>('setFontLineSpacing', {"space": space});
+    await methodChannel.invokeMethod<void>('setFontLineSpacing', {
+      "space": space,
+    });
   }
 
   @override
   Future<void> setFontChineseSpace(int leftSpace, int rightSpace) async {
-    await methodChannel.invokeMethod<void>('setFontChineseSpace',
-        {"leftSpace": leftSpace, "rightSpace": rightSpace});
+    await methodChannel.invokeMethod<void>('setFontChineseSpace', {
+      "leftSpace": leftSpace,
+      "rightSpace": rightSpace,
+    });
   }
 
   @override
   Future<void> setFontCharSpace(int space) async {
-    await methodChannel
-        .invokeMethod<void>('setFontCharSpace', {"space": space});
+    await methodChannel.invokeMethod<void>('setFontCharSpace', {
+      "space": space,
+    });
   }
 
   @override
   Future<void> setFontChineseSize(
-      int height, int width, int underLine, int chineseType) async {
+    int height,
+    int width,
+    int underLine,
+    int chineseType,
+  ) async {
     await methodChannel.invokeMethod<void>('setFontChineseSize', {
       "height": height,
       "width": width,
       "underLine": underLine,
-      "chineseType": chineseType
+      "chineseType": chineseType,
     });
   }
 
   @override
   Future<void> setFontCharSize(
-      int height, int width, int underLine, int asciiType) async {
+    int height,
+    int width,
+    int underLine,
+    int asciiType,
+  ) async {
     await methodChannel.invokeMethod<void>('setFontCharSize', {
       "height": height,
       "width": width,
       "underLine": underLine,
-      "asciiType": asciiType
+      "asciiType": asciiType,
     });
   }
 
   @override
   Future<void> setFontChineseMode(int mode) async {
-    await methodChannel
-        .invokeMethod<void>('setFontChineseMode', {"mode": mode});
+    await methodChannel.invokeMethod<void>('setFontChineseMode', {
+      "mode": mode,
+    });
   }
 
   @override
   Future<void> setFontCountryCode(int country) async {
-    await methodChannel
-        .invokeMethod<void>('setFontCountryCode', {"country": country});
+    await methodChannel.invokeMethod<void>('setFontCountryCode', {
+      "country": country,
+    });
   }
 
   @override
@@ -1124,13 +1168,17 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   // --- 文本打印补充 ---
   @override
   Future<void> printTextWithAli(String text, int align) async {
-    await methodChannel
-        .invokeMethod<void>('printTextWithAli', {"text": text, "align": align});
+    await methodChannel.invokeMethod<void>('printTextWithAli', {
+      "text": text,
+      "align": align,
+    });
   }
 
   @override
-  Future<void> printEscPosText(String text,
-      {IminEscPosTextStyle? style}) async {
+  Future<void> printEscPosText(
+    String text, {
+    IminEscPosTextStyle? style,
+  }) async {
     Map<String, dynamic> arguments = <String, dynamic>{"text": text};
     if (style != null) {
       if (style.widthMultiple != null) {
@@ -1154,45 +1202,63 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> printTextWithEncode(String text, String encode) async {
-    await methodChannel.invokeMethod<void>(
-        'printTextWithEncode', {"text": text, "encode": encode});
+    await methodChannel.invokeMethod<void>('printTextWithEncode', {
+      "text": text,
+      "encode": encode,
+    });
   }
 
   // --- 走纸/切纸补充 ---
   @override
   Future<void> printAndQuitPaper(int value) async {
-    await methodChannel
-        .invokeMethod<void>('printAndQuitPaper', {"value": value});
+    await methodChannel.invokeMethod<void>('printAndQuitPaper', {
+      "value": value,
+    });
   }
 
   @override
   Future<void> partialCutAndFeedPaper(int length) async {
-    await methodChannel
-        .invokeMethod<void>('partialCutAndFeedPaper', {"length": length});
+    await methodChannel.invokeMethod<void>('partialCutAndFeedPaper', {
+      "length": length,
+    });
   }
 
   @override
   Future<void> fullCutAndFeedPaper(int length) async {
-    await methodChannel
-        .invokeMethod<void>('fullCutAndFeedPaper', {"length": length});
+    await methodChannel.invokeMethod<void>('fullCutAndFeedPaper', {
+      "length": length,
+    });
   }
 
   // --- 高级2D码 ---
   @override
-  Future<void> print2DCode(String data, int symbology, int moduleSize,
-      int errorLevel, int align) async {
+  Future<void> print2DCode(
+    String data,
+    int symbology,
+    int moduleSize,
+    int errorLevel,
+    int align,
+  ) async {
     await methodChannel.invokeMethod<void>('print2DCode', {
       "data": data,
       "symbology": symbology,
       "moduleSize": moduleSize,
       "errorLevel": errorLevel,
-      "align": align
+      "align": align,
     });
   }
 
   @override
-  Future<void> printPDF417(String data, int columns, int rows, int moduleWidth,
-      int rowHeight, int errorLevel, int selectOptions, int align) async {
+  Future<void> printPDF417(
+    String data,
+    int columns,
+    int rows,
+    int moduleWidth,
+    int rowHeight,
+    int errorLevel,
+    int selectOptions,
+    int align,
+  ) async {
     await methodChannel.invokeMethod<void>('printPDF417', {
       "data": data,
       "columns": columns,
@@ -1201,72 +1267,97 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
       "rowHeight": rowHeight,
       "errorLevel": errorLevel,
       "selectOptions": selectOptions,
-      "align": align
+      "align": align,
     });
   }
 
   @override
   Future<void> printMaxiCode(String data, int modeType, int align) async {
-    await methodChannel.invokeMethod<void>(
-        'printMaxiCode', {"data": data, "modeType": modeType, "align": align});
+    await methodChannel.invokeMethod<void>('printMaxiCode', {
+      "data": data,
+      "modeType": modeType,
+      "align": align,
+    });
   }
 
   @override
-  Future<void> printAztecCode(String data, int modeType, int dataLayers,
-      int moduleSize, int errorLevel, int align) async {
+  Future<void> printAztecCode(
+    String data,
+    int modeType,
+    int dataLayers,
+    int moduleSize,
+    int errorLevel,
+    int align,
+  ) async {
     await methodChannel.invokeMethod<void>('printAztecCode', {
       "data": data,
       "modeType": modeType,
       "dataLayers": dataLayers,
       "moduleSize": moduleSize,
       "errorLevel": errorLevel,
-      "align": align
+      "align": align,
     });
   }
 
   @override
-  Future<void> printDataMatrix(String data, int symbolType, int columns,
-      int rows, int moduleSize, int align) async {
+  Future<void> printDataMatrix(
+    String data,
+    int symbolType,
+    int columns,
+    int rows,
+    int moduleSize,
+    int align,
+  ) async {
     await methodChannel.invokeMethod<void>('printDataMatrix', {
       "data": data,
       "symbolType": symbolType,
       "columns": columns,
       "rows": rows,
       "moduleSize": moduleSize,
-      "align": align
+      "align": align,
     });
   }
 
   // --- 通用 Key-Value 接口 ---
   @override
   Future<bool?> setPrinterAction(String keyName, String keyValue) async {
-    return await methodChannel.invokeMethod<bool>(
-        'setPrinterAction', {"keyName": keyName, "keyValue": keyValue});
+    return await methodChannel.invokeMethod<bool>('setPrinterAction', {
+      "keyName": keyName,
+      "keyValue": keyValue,
+    });
   }
 
   @override
   Future<bool?> setPrinterActionList(
-      String keyName, List<String> keyValue) async {
-    return await methodChannel.invokeMethod<bool>(
-        'setPrinterActionList', {"keyName": keyName, "keyValue": keyValue});
+    String keyName,
+    List<String> keyValue,
+  ) async {
+    return await methodChannel.invokeMethod<bool>('setPrinterActionList', {
+      "keyName": keyName,
+      "keyValue": keyValue,
+    });
   }
 
   @override
   Future<String?> getPrinterInfoByKey(String keyName) async {
-    return await methodChannel
-        .invokeMethod<String>('getPrinterInfo', {"keyName": keyName});
+    return await methodChannel.invokeMethod<String>('getPrinterInfo', {
+      "keyName": keyName,
+    });
   }
 
   @override
   Future<List<String>?> getPrinterInfoList(String keyName) async {
-    return await methodChannel
-        .invokeMethod<List<String>>('getPrinterInfoList', {"keyName": keyName});
+    return await methodChannel.invokeMethod<List<String>>(
+      'getPrinterInfoList',
+      {"keyName": keyName},
+    );
   }
 
   @override
   Future<String?> getPrinterInfoString(String keyName) async {
-    return await methodChannel
-        .invokeMethod<String>('getPrinterInfoString', {"keyName": keyName});
+    return await methodChannel.invokeMethod<String>('getPrinterInfoString', {
+      "keyName": keyName,
+    });
   }
 
   // --- 打印机信息/设置补充 ---
@@ -1282,8 +1373,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<List<String>?> getPrinterPatternList() async {
-    return await methodChannel
-        .invokeMethod<List<String>>('getPrinterPatternList');
+    return await methodChannel.invokeMethod<List<String>>(
+      'getPrinterPatternList',
+    );
   }
 
   @override
@@ -1299,39 +1391,48 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
   // --- 事务打印带回调 ---
   @override
   Future<bool?> commitPrinterBufferWithCallback() async {
-    return await methodChannel
-        .invokeMethod<bool>('commitPrinterBufferWithCallback');
+    return await methodChannel.invokeMethod<bool>(
+      'commitPrinterBufferWithCallback',
+    );
   }
 
   @override
   Future<bool?> exitPrinterBufferWithCallback(bool isCommit) async {
     return await methodChannel.invokeMethod<bool>(
-        'exitPrinterBufferWithCallback', {"isCommit": isCommit});
+      'exitPrinterBufferWithCallback',
+      {"isCommit": isCommit},
+    );
   }
 
   // --- 标签打印补充 ---
   @override
   Future<void> labelPrintBitmap(Uint8List bitmap, int width, int height) async {
-    await methodChannel.invokeMethod<void>('labelPrintBitmap',
-        {"bitmap": bitmap, "width": width, "height": height});
+    await methodChannel.invokeMethod<void>('labelPrintBitmap', {
+      "bitmap": bitmap,
+      "width": width,
+      "height": height,
+    });
   }
 
   @override
   Future<String?> labelGapSensorCalibration() async {
-    return await methodChannel
-        .invokeMethod<String>('labelGapSensorCalibration');
+    return await methodChannel.invokeMethod<String>(
+      'labelGapSensorCalibration',
+    );
   }
 
   @override
   Future<void> labelSetPrinterMode(int mode) async {
-    await methodChannel
-        .invokeMethod<void>('labelSetPrinterMode', {"mode": mode});
+    await methodChannel.invokeMethod<void>('labelSetPrinterMode', {
+      "mode": mode,
+    });
   }
 
   @override
   Future<String?> labelQueryInfo(IminLabelInfo labelInfo) async {
-    return await methodChannel
-        .invokeMethod<String>('labelQueryInfo', {"code": labelInfo.name});
+    return await methodChannel.invokeMethod<String>('labelQueryInfo', {
+      "code": labelInfo.name,
+    });
   }
 
   @override
@@ -1341,8 +1442,9 @@ class MethodChannelIminPrinter extends IminPrinterPlatform {
 
   @override
   Future<void> setLabelContinuousPrint(bool enable) async {
-    await methodChannel
-        .invokeMethod<void>('setLabelContinuousPrint', {"enable": enable});
+    await methodChannel.invokeMethod<void>('setLabelContinuousPrint', {
+      "enable": enable,
+    });
   }
 
   // --- 状态监听 ---
